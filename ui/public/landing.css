@@ -151,6 +151,10 @@ body {
     position: relative;
 }
 
+.pricing-card.free {
+    border: 2px solid #F97316;
+}
+
 .pricing-card:hover {
     border-color: #F97316;
     box-shadow: 0 4px 20px rgba(249, 115, 22, 0.1);

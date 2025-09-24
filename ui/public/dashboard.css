@@ -49,8 +49,8 @@ body {
     align-items: center;
     gap: 0.5rem;
     background: none;
-    border: 2px solid #6C5BFF;
-    color: #6C5BFF;
+    border: 2px solid #F97316;
+    color: #F97316;
     border-radius: 6px;
     padding: 0.5rem 1rem;
     font-size: 0.75rem;
@@ -62,7 +62,7 @@ body {
 }
 
 .back-button:hover {
-    background-color: #6C5BFF;
+    background-color: #F97316;
     color: white;
 }
 
@@ -100,8 +100,8 @@ body {
         }
 
 .metric-card:hover {
-    border-color: #6C5BFF;
-    box-shadow: 0 4px 12px rgba(108, 91, 255, 0.1);
+    border-color: #F97316;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
 }
 
 .metric-card.overall-score {
@@ -299,12 +299,12 @@ body {
 }
 
 .benchmark-scroll::-webkit-scrollbar-thumb {
-    background: #6C5BFF;
+    background: #F97316;
     border-radius: 2px;
 }
 
 .benchmark-scroll::-webkit-scrollbar-thumb:hover {
-    background: #5B4AE8;
+    background: #EA580C;
 }
 
 .benchmark-icon {
@@ -494,7 +494,7 @@ body {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #6C5BFF;
+    background-color: #F97316;
     color: white;
     border: none;
     border-radius: 50%;
@@ -502,7 +502,7 @@ body {
     height: 60px;
     font-size: 1.5rem;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(108, 91, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -511,9 +511,9 @@ body {
 }
 
 .ai-button:hover {
-    background-color: #5B4AE8;
+    background-color: #EA580C;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(108, 91, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
 /* Mobile Toggle Button */

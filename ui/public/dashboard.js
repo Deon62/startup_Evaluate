@@ -176,7 +176,7 @@ function createOverallScoreChart(score) {
         data: {
             datasets: [{
                 data: [score, 100 - score],
-                backgroundColor: ['#6C5BFF', '#E5E7EB'],
+                backgroundColor: ['#F97316', '#E5E7EB'],
                 borderWidth: 0,
                 cutout: '80%'
             }]
@@ -254,14 +254,14 @@ function createScoresChart() {
                     mockScores.monetization,
                     mockScores.riskLevel
                 ],
-                backgroundColor: [
-                    '#6C5BFF',
-                    '#6C5BFF',
-                    '#6C5BFF',
-                    '#16A34A',
-                    '#6C5BFF',
-                    '#6C5BFF'
-                ],
+                        backgroundColor: [
+                            '#F97316',
+                            '#F97316',
+                            '#F97316',
+                            '#F97316',
+                            '#F97316',
+                            '#F97316'
+                        ],
                 borderRadius: 2,
                 borderSkipped: false,
             }]
@@ -526,7 +526,7 @@ function openAIChat() {
             align-self: flex-start;
         }
         .user-message {
-            background: #6C5BFF;
+            background: #F97316;
             color: white;
             align-self: flex-end;
         }
@@ -544,7 +544,7 @@ function openAIChat() {
         }
         .ai-chat-input button {
             padding: 0.5rem 1rem;
-            background: #6C5BFF;
+            background: #F97316;
             color: white;
             border: none;
             border-radius: 6px;
