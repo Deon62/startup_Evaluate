@@ -664,3 +664,150 @@ function getAIResponse(userMessage) {
 function goBack() {
     window.location.href = '/questions.html';
 }
+
+// PDF Export functionality
+function exportToPDF() {
+    const evaluationData = getEvaluationData();
+    if (!evaluationData || !evaluationData.evaluation) {
+        alert('No evaluation data available to export');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Set up colors
+    const primaryColor = '#F97316';
+    const textColor = '#0F172A';
+    const mutedColor = '#6B7280';
+    
+    let yPosition = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
+    
+    // Helper function to add text with word wrapping
+    function addWrappedText(text, x, y, maxWidth, fontSize = 10, color = textColor) {
+        doc.setFontSize(fontSize);
+        doc.setTextColor(color);
+        const lines = doc.splitTextToSize(text, maxWidth);
+        doc.text(lines, x, y);
+        return y + (lines.length * fontSize * 0.4);
+    }
+    
+    // Helper function to add a section header
+    function addSectionHeader(title, y) {
+        doc.setFontSize(16);
+        doc.setTextColor(primaryColor);
+        doc.setFont(undefined, 'bold');
+        doc.text(title, margin, y);
+        doc.setFont(undefined, 'normal');
+        return y + 10;
+    }
+    
+    // Helper function to add a subsection
+    function addSubsection(title, content, y) {
+        y = addWrappedText(title, margin, y, contentWidth, 12, primaryColor);
+        doc.setFont(undefined, 'bold');
+        y = addWrappedText(content, margin, y, contentWidth, 10, textColor);
+        doc.setFont(undefined, 'normal');
+        return y + 5;
+    }
+    
+    // Header
+    doc.setFontSize(24);
+    doc.setTextColor(primaryColor);
+    doc.setFont(undefined, 'bold');
+    doc.text('Evalio - Startup Evaluation Report', margin, yPosition);
+    yPosition += 15;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(mutedColor);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, margin, yPosition);
+    yPosition += 20;
+    
+    // Executive Summary
+    yPosition = addSectionHeader('Executive Summary', yPosition);
+    yPosition = addWrappedText(evaluationData.evaluation.executiveSnapshot || 'No summary available', margin, yPosition, contentWidth, 11, textColor);
+    yPosition += 15;
+    
+    // Overall Score
+    yPosition = addSectionHeader('Overall Assessment', yPosition);
+    doc.setFontSize(32);
+    doc.setTextColor(primaryColor);
+    doc.setFont(undefined, 'bold');
+    doc.text(`${evaluationData.evaluation.overallScore}/100`, margin, yPosition);
+    yPosition += 15;
+    
+    // Individual Scores
+    yPosition = addSectionHeader('Detailed Scores', yPosition);
+    const scores = evaluationData.evaluation.individualScores || {};
+    const scoreLabels = {
+        clarity: 'Clarity',
+        marketFit: 'Market Fit',
+        feasibility: 'Feasibility',
+        differentiation: 'Differentiation'
+    };
+    
+    Object.entries(scoreLabels).forEach(([key, label]) => {
+        if (scores[key] !== undefined) {
+            yPosition = addSubsection(`${label}:`, `${scores[key]}/100`, yPosition);
+        }
+    });
+    yPosition += 10;
+    
+    // Strengths
+    if (evaluationData.evaluation.strengths && evaluationData.evaluation.strengths.length > 0) {
+        yPosition = addSectionHeader('Key Strengths', yPosition);
+        evaluationData.evaluation.strengths.forEach(strength => {
+            yPosition = addWrappedText(`• ${strength}`, margin + 5, yPosition, contentWidth - 5, 10, textColor);
+        });
+        yPosition += 10;
+    }
+    
+    // Areas for Improvement
+    if (evaluationData.evaluation.concerns && evaluationData.evaluation.concerns.length > 0) {
+        yPosition = addSectionHeader('Areas for Improvement', yPosition);
+        evaluationData.evaluation.concerns.forEach(concern => {
+            yPosition = addWrappedText(`• ${concern}`, margin + 5, yPosition, contentWidth - 5, 10, textColor);
+        });
+        yPosition += 10;
+    }
+    
+    // Recommendations
+    if (evaluationData.evaluation.recommendations && evaluationData.evaluation.recommendations.length > 0) {
+        yPosition = addSectionHeader('Recommendations', yPosition);
+        evaluationData.evaluation.recommendations.forEach((rec, index) => {
+            yPosition = addWrappedText(`${index + 1}. ${rec}`, margin + 5, yPosition, contentWidth - 5, 10, textColor);
+        });
+        yPosition += 10;
+    }
+    
+    // Business Metrics
+    yPosition = addSectionHeader('Business Metrics', yPosition);
+    const metrics = [
+        { key: 'businessValuation', label: 'Business Valuation' },
+        { key: 'fundingReadiness', label: 'Funding Readiness' },
+        { key: 'marketMomentum', label: 'Market Momentum' },
+        { key: 'riskExposure', label: 'Risk Exposure' }
+    ];
+    
+    metrics.forEach(metric => {
+        const data = evaluationData.evaluation[metric.key];
+        if (data) {
+            yPosition = addSubsection(`${metric.label}:`, `${data.text} - ${data.description}`, yPosition);
+        }
+    });
+    
+    // Footer
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.setFontSize(8);
+    doc.setTextColor(mutedColor);
+    doc.text('Generated by Evalio - Startup Validation Platform', margin, pageHeight - 10);
+    doc.text('Visit us at your-domain.com', pageWidth - margin - 30, pageHeight - 10);
+    
+    // Save the PDF
+    const fileName = `Evalio-Report-${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+}

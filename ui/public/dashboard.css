@@ -66,6 +66,29 @@ body {
     color: white;
 }
 
+.export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #F97316;
+    border: 2px solid #F97316;
+    color: white;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.export-button:hover {
+    background-color: #EA580C;
+    border-color: #EA580C;
+    transform: translateY(-1px);
+}
+
 .dashboard-header h1 {
     font-size: 1.75rem;
     font-weight: 700;
