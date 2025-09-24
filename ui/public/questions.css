@@ -23,6 +23,31 @@ body {
 .header {
     text-align: center;
     margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.back-to-landing {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #F97316;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-to-landing:hover {
+    color: #EA580C;
+    background-color: #FEF3F2;
 }
 
 .header h1 {

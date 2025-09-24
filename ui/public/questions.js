@@ -125,3 +125,8 @@ async function handleEvaluate() {
         isLoading = false;
     }
 }
+
+// Back to landing page function
+function goToLanding() {
+    window.location.href = 'index.html';
+}
