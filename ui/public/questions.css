@@ -13,6 +13,102 @@ body {
     min-height: 100vh;
 }
 
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #FAFBFF;
+    border-right: 1px solid #E5E7EB;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 1rem;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FFFFFF;
+}
+
+.sidebar-header h3 {
+    color: #F97316;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-sidebar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6B7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.close-sidebar:hover {
+    background-color: #F3F4F6;
+    color: #F97316;
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #6B7280;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+    background-color: #F3F4F6;
+    color: #F97316;
+}
+
+.nav-link.active {
+    background-color: #FEF3F2;
+    color: #F97316;
+    border-left-color: #F97316;
+}
+
+.nav-text {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.sidebar-open {
+    margin-left: 250px;
+}
+
 .container {
     max-width: 700px;
     margin: 0 auto;
@@ -24,30 +120,40 @@ body {
     text-align: center;
     margin-bottom: 1.5rem;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.back-to-landing {
+.menu-toggle {
     position: absolute;
     left: 0;
-    top: 0;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: #F97316;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    width: 32px;
-    height: 32px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
+    background: none;
+    border: none;
+    color: #0F172A;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
 }
 
-.back-to-landing:hover {
-    color: #EA580C;
-    background-color: #FEF3F2;
+.menu-toggle:hover {
+    color: #6B7280;
+}
+
+.menu-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 .header h1 {
@@ -55,18 +161,24 @@ body {
     font-weight: 700;
     color: #0F172A;
     margin-bottom: 0.5rem;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
 .subtitle {
     font-size: 1rem;
     color: #6B7280;
     margin-bottom: 1rem;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
 /* Progress Indicator */
 .progress-indicator {
     max-width: 300px;
     margin: 0 auto;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
 .progress-text {
@@ -238,10 +350,19 @@ body {
     
     .header h1 {
         font-size: 1.8rem;
+        padding-left: 35px;
+        padding-right: 35px;
     }
     
     .subtitle {
         font-size: 0.9rem;
+        padding-left: 35px;
+        padding-right: 35px;
+    }
+    
+    .progress-indicator {
+        padding-left: 35px;
+        padding-right: 35px;
     }
     
     .question-card {
@@ -274,6 +395,18 @@ body {
     
     .header h1 {
         font-size: 1.6rem;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+    
+    .subtitle {
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+    
+    .progress-indicator {
+        padding-left: 32px;
+        padding-right: 32px;
     }
     
     .question-card {
@@ -291,5 +424,28 @@ body {
     .evaluate-section {
         padding: 0.6rem 0.6rem;
         margin: 0 -0.6rem; /* Extend to full width */
+    }
+    
+    /* Sidebar mobile styles */
+    .sidebar {
+        width: 280px;
+        left: -280px;
+    }
+    
+    .main-content.sidebar-open {
+        margin-left: 0;
+    }
+    
+    .sidebar.open {
+        left: 0;
+    }
+    
+    .menu-toggle {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .menu-icon {
+        font-size: 1rem;
     }
 }
