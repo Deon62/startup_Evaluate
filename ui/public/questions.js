@@ -120,7 +120,7 @@ async function handleEvaluate() {
         
         setTimeout(() => {
             window.location.href = 'dashboard.html';
-        }, 1500);
+        }, 2000);
         
     } catch (error) {
         console.error('Error evaluating startup:', error);
@@ -262,10 +262,11 @@ function createLoadingOverlay() {
             top: 0;
             left: 0;
             height: 100%;
-            background: #F97316;
+            background: #F97316 !important;
             border-radius: 4px;
-            width: 0%;
-            transition: width 0.3s ease;
+            width: 0% !important;
+            transition: width 0.8s ease-in-out;
+            z-index: 1;
         }
         
         @keyframes progress {
@@ -335,6 +336,16 @@ function createLoadingOverlay() {
     
     // Start progressive feedback
     startProgressiveFeedback();
+    
+    // Initialize progress bar to 0%
+    setTimeout(() => {
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        if (progressFill && progressText) {
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+        }
+    }, 100);
 }
 
 // Progressive feedback messages
@@ -346,7 +357,8 @@ function startProgressiveFeedback() {
         { text: "Calculating feasibility scores...", delay: 9000, progress: 60 },
         { text: "Generating personalized insights...", delay: 12000, progress: 75 },
         { text: "Finding similar startup patterns...", delay: 15000, progress: 90 },
-        { text: "Finalizing your evaluation...", delay: 18000, progress: 100 }
+        { text: "Finalizing your evaluation...", delay: 18000, progress: 100 },
+        { text: "Polishing your results and cross-checking them...", delay: 21000, progress: 100, isPolishing: true }
     ];
     
     let currentMessageIndex = 0;
@@ -363,8 +375,15 @@ function startProgressiveFeedback() {
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             if (progressFill && progressText) {
+                console.log('Updating progress to:', message.progress + '%');
+                // Force a reflow to ensure the width change is applied
+                progressFill.style.width = '0%';
+                progressFill.offsetHeight; // Trigger reflow
                 progressFill.style.width = message.progress + '%';
                 progressText.textContent = message.progress + '%';
+                console.log('Progress bar width set to:', progressFill.style.width);
+            } else {
+                console.log('Progress elements not found:', { progressFill, progressText });
             }
             
             // Add new tip
@@ -381,6 +400,22 @@ function startProgressiveFeedback() {
             const tips = tipsContainer.querySelectorAll('.tip-item');
             if (tips.length > 3) {
                 tips[0].remove();
+            }
+            
+            // Special handling for polishing step
+            if (message.isPolishing) {
+                // Add polishing animation to the progress bar
+                progressFill.style.animation = 'polishing 1.5s ease-in-out infinite';
+                
+                // Add polishing styles
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes polishing {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.7; }
+                    }
+                `;
+                document.head.appendChild(style);
             }
             
             currentMessageIndex++;
