@@ -109,43 +109,97 @@
     <section class="testimonials">
         <div class="container">
             <h2 class="section-title">What Our Users Say</h2>
-            <div class="testimonial-cards">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Helped us validate our pitch before investors."</p>
-                    <div class="testimonial-author">
-                        <span class="author-name">Sarah</span>
-                        <span class="author-title">Founder</span>
+            <div class="testimonial-carousel">
+                <button class="carousel-btn prev-btn" onclick="moveSlide(-1)">‹</button>
+                <div class="carousel-container">
+                    <div class="carousel-track" id="carouselTrack">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"Helped us validate our pitch before investors. The insights were spot-on and saved us months of guesswork."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">S</div>
+                                    <div class="author-info">
+                                        <span class="author-name">Sarah Chen</span>
+                                        <span class="author-title">Founder, TechFlow</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"The insights are sharper than any spreadsheet model I've seen. This tool is a game-changer for startup validation."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">D</div>
+                                    <div class="author-info">
+                                        <span class="author-name">David Rodriguez</span>
+                                        <span class="author-title">Startup Advisor</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"Super easy to use and gave our idea clarity. We pivoted based on the feedback and it was the right call."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">L</div>
+                                    <div class="author-info">
+                                        <span class="author-name">Lina Park</span>
+                                        <span class="author-title">Student Entrepreneur</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"Finally, a tool that gives honest feedback instead of just positive reinforcement. This helped us avoid costly mistakes."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">M</div>
+                                    <div class="author-info">
+                                        <span class="author-name">Marcus Johnson</span>
+                                        <span class="author-title">Serial Entrepreneur</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                <p class="testimonial-text">"The AI analysis is incredibly detailed. It caught risks we hadn't even considered and provided actionable recommendations."</p>
+                                <div class="testimonial-author">
+                                    <div class="author-avatar">A</div>
+                                    <div class="author-info">
+                                        <span class="author-name">Alex Thompson</span>
+                                        <span class="author-title">Product Manager</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"The insights are sharper than any spreadsheet model I've seen."</p>
-                    <div class="testimonial-author">
-                        <span class="author-name">David</span>
-                        <span class="author-title">Startup Advisor</span>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Super easy to use and gave our idea clarity."</p>
-                    <div class="testimonial-author">
-                        <span class="author-name">Lina</span>
-                        <span class="author-title">Student Entrepreneur</span>
-                    </div>
-                </div>
+                <button class="carousel-btn next-btn" onclick="moveSlide(1)">›</button>
+            </div>
+            <div class="carousel-dots" id="carouselDots">
+                <!-- Dots will be generated by JavaScript -->
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
+        <div class="footer-container">
             <div class="footer-content">
-                <div class="footer-links">
-                    <a href="#" class="footer-link">About</a>
-                    <a href="#" class="footer-link">Privacy</a>
-                    <a href="#" class="footer-link">Terms</a>
+                <div class="footer-social">
+                    <a href="https://twitter.com/pinakle_org" target="_blank" class="social-link" title="Follow us on Twitter">
+                        <span>Twitter</span>
+                    </a>
+                    <a href="https://huggingface.co/chinesemusk" target="_blank" class="social-link" title="Check out our AI models">
+                        <span>Hugging Face</span>
+                    </a>
+                    <a href="https://medium.com/@deon." target="_blank" class="social-link" title="Read our articles">
+                        <span>Medium</span>
+                    </a>
                 </div>
                 <div class="footer-copyright">
-                    <p>&copy; 2024 StartupVal. All rights reserved.</p>
+                    <p>&copy; 2024 Evalio. All rights reserved.</p>
                 </div>
             </div>
         </div>

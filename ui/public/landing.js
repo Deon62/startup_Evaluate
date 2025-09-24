@@ -3,6 +3,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize pricing toggle
     initializePricingToggle();
+    
+    // Initialize testimonial carousel
+    initializeCarousel();
 });
 
 function initializePricingToggle() {
@@ -81,5 +84,122 @@ window.addEventListener('scroll', function() {
         header.style.background = 'transparent';
         header.style.backdropFilter = 'none';
         header.style.boxShadow = 'none';
+    }
+});
+
+// Testimonial Carousel functionality
+let currentSlide = 0;
+let totalSlides = 0;
+let slidesToShow = 3;
+let autoplayInterval;
+
+function initializeCarousel() {
+    const track = document.getElementById('carouselTrack');
+    const cards = track.querySelectorAll('.testimonial-card');
+    totalSlides = cards.length;
+    
+    // Set responsive slides to show
+    updateSlidesToShow();
+    
+    // Generate dots
+    generateDots();
+    
+    // Set initial position
+    updateCarousel();
+    
+    // Start autoplay
+    startAutoplay();
+    
+    // Handle window resize
+    window.addEventListener('resize', updateSlidesToShow);
+}
+
+function updateSlidesToShow() {
+    if (window.innerWidth <= 768) {
+        slidesToShow = 1;
+    } else if (window.innerWidth <= 1024) {
+        slidesToShow = 2;
+    } else {
+        slidesToShow = 3;
+    }
+    
+    // Update carousel if already initialized
+    if (totalSlides > 0) {
+        updateCarousel();
+        generateDots();
+    }
+}
+
+function generateDots() {
+    const dotsContainer = document.getElementById('carouselDots');
+    const totalDots = Math.ceil(totalSlides / slidesToShow);
+    
+    dotsContainer.innerHTML = '';
+    
+    for (let i = 0; i < totalDots; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot';
+        if (i === Math.floor(currentSlide / slidesToShow)) {
+            dot.classList.add('active');
+        }
+        dot.addEventListener('click', () => goToSlide(i * slidesToShow));
+        dotsContainer.appendChild(dot);
+    }
+}
+
+function updateCarousel() {
+    const track = document.getElementById('carouselTrack');
+    const cardWidth = 280 + 16; // card width (280px) + gap (16px)
+    const translateX = -currentSlide * cardWidth;
+    track.style.transform = `translateX(${translateX}px)`;
+    
+    // Update dots
+    const dots = document.querySelectorAll('.carousel-dot');
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === Math.floor(currentSlide / slidesToShow));
+    });
+}
+
+function moveSlide(direction) {
+    const maxSlide = totalSlides - slidesToShow;
+    
+    if (direction === 1) {
+        currentSlide = currentSlide >= maxSlide ? 0 : currentSlide + 1;
+    } else {
+        currentSlide = currentSlide <= 0 ? maxSlide : currentSlide - 1;
+    }
+    
+    updateCarousel();
+    resetAutoplay();
+}
+
+function goToSlide(slideIndex) {
+    currentSlide = Math.min(slideIndex, totalSlides - slidesToShow);
+    updateCarousel();
+    resetAutoplay();
+}
+
+function startAutoplay() {
+    autoplayInterval = setInterval(() => {
+        moveSlide(1);
+    }, 5000); // Change slide every 5 seconds
+}
+
+function resetAutoplay() {
+    clearInterval(autoplayInterval);
+    startAutoplay();
+}
+
+// Pause autoplay on hover
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.querySelector('.testimonial-carousel');
+    if (carousel) {
+        carousel.addEventListener('mouseenter', () => {
+            clearInterval(autoplayInterval);
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+            startAutoplay();
+        });
     }
 });
