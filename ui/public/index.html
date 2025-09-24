@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Validation - Turn Ideas Into Insights</title>
+    <link rel="stylesheet" href="landing.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <!-- Logo removed for minimal design -->
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Turn Startup Ideas Into Measurable Insights</h1>
+                <p class="hero-subtext">Evaluate clarity, feasibility, market fit, and growth potential of your startup idea in minutes.</p>
+                <button class="cta-button" onclick="startEvaluation()">
+                    <span>Start Evaluation</span>
+                    <span class="button-icon">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title">Simple Pricing for Everyone</h2>
+            
+            <div class="pricing-toggle">
+                <button class="toggle-button active" id="monthlyToggle">Monthly</button>
+                <button class="toggle-button" id="annuallyToggle">Annually</button>
+            </div>
+
+            <div class="pricing-cards">
+                <!-- Free Tier -->
+                <div class="pricing-card free">
+                    <div class="card-header">
+                        <h3>Free</h3>
+                        <div class="price">
+                            <span class="currency">$</span>
+                            <span class="amount">0</span>
+                            <span class="period">/month</span>
+                        </div>
+                    </div>
+                    <ul class="features">
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>3 Free Evaluations / Month</span>
+                        </li>
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>Basic Metrics (Clarity, Market Fit, Feasibility)</span>
+                        </li>
+                        <li class="feature disabled">
+                            <span class="cross">•</span>
+                            <span>No advanced graphs</span>
+                        </li>
+                    </ul>
+                    <button class="card-button free-button" onclick="startEvaluation()">Get Started (Free)</button>
+                </div>
+
+                <!-- Pro Tier -->
+                <div class="pricing-card pro">
+                    <div class="card-header">
+                        <h3>Pro</h3>
+                        <div class="price">
+                            <span class="currency">$</span>
+                            <span class="amount">49</span>
+                            <span class="period">/month</span>
+                        </div>
+                    </div>
+                    <ul class="features">
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>One-time Lifetime Payment</span>
+                        </li>
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>Unlimited Evaluations</span>
+                        </li>
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>All Metrics (Risk, Differentiation, Valuation)</span>
+                        </li>
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>Export Reports</span>
+                        </li>
+                        <li class="feature">
+                            <span class="check">•</span>
+                            <span>Priority Support</span>
+                        </li>
+                    </ul>
+                    <button class="card-button pro-button" onclick="upgradeToPro()">Upgrade to Pro</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Our Users Say</h2>
+            <div class="testimonial-cards">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Helped us validate our pitch before investors."</p>
+                    <div class="testimonial-author">
+                        <span class="author-name">Sarah</span>
+                        <span class="author-title">Founder</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The insights are sharper than any spreadsheet model I've seen."</p>
+                    <div class="testimonial-author">
+                        <span class="author-name">David</span>
+                        <span class="author-title">Startup Advisor</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Super easy to use and gave our idea clarity."</p>
+                    <div class="testimonial-author">
+                        <span class="author-name">Lina</span>
+                        <span class="author-title">Student Entrepreneur</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Privacy</a>
+                    <a href="#" class="footer-link">Terms</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2024 StartupVal. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="landing.js"></script>
+</body>
+</html>

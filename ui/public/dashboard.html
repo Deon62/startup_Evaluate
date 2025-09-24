@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Results - Startup Validation</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="dashboard-container">
+            <div class="dashboard-main">
+                <header class="dashboard-header">
+                    <button class="back-button" onclick="goBack()">
+                        ← Back to Questions
+                    </button>
+                    <h1>Evaluation Results</h1>
+                </header>
+
+            <div class="metrics-grid">
+                <!-- Overall Score Card -->
+                <div class="metric-card overall-score">
+                    <div class="metric-header">
+                        <h3>Overall Score</h3>
+                    </div>
+                    <div class="circular-progress-container">
+                        <canvas id="overallScoreChart" width="60" height="60"></canvas>
+                        <div class="circular-progress-text">
+                            <span class="score" id="overallScoreValue">0</span>
+                            <span class="label">/100</span>
+                        </div>
+                    </div>
+                </div>
+
+                        <!-- Business Valuation Card -->
+                        <div class="metric-card badge-card">
+                            <div class="metric-header">
+                                <h3>Business Valuation (Est.)</h3>
+                            </div>
+                            <div class="badge-container">
+                                <div class="metric-badge" id="businessValuationBadge">
+                                    <span class="badge-dot green"></span>
+                                    <span class="badge-text">Above $2M</span>
+                                </div>
+                                <div class="metric-description">
+                                    Strong early traction signal
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Funding Readiness Card -->
+                        <div class="metric-card badge-card">
+                            <div class="metric-header">
+                                <h3>Funding Readiness</h3>
+                            </div>
+                            <div class="badge-container">
+                                <div class="metric-badge" id="fundingReadinessBadge">
+                                    <span class="badge-dot yellow"></span>
+                                    <span class="badge-text">40-70%</span>
+                                </div>
+                                <div class="metric-description">
+                                    Needs more validation
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Market Momentum Card -->
+                        <div class="metric-card badge-card">
+                            <div class="metric-header">
+                                <h3>Market Momentum</h3>
+                            </div>
+                            <div class="badge-container">
+                                <div class="metric-badge" id="marketMomentumBadge">
+                                    <span class="badge-dot green"></span>
+                                    <span class="badge-text">>15% CAGR</span>
+                                </div>
+                                <div class="metric-description">
+                                    Fast-growing sector, hot
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Risk Exposure Card -->
+                        <div class="metric-card badge-card">
+                            <div class="metric-header">
+                                <h3>Risk Exposure</h3>
+                            </div>
+                            <div class="badge-container">
+                                <div class="metric-badge" id="riskExposureBadge">
+                                    <span class="badge-dot red"></span>
+                                    <span class="badge-text">High</span>
+                                </div>
+                                <div class="metric-description">
+                                    4+ risks, high fragility
+                                </div>
+                            </div>
+                        </div>
+
+                <!-- Strengths Card -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Strengths</h3>
+                    </div>
+                    <ul class="metric-list" id="strengthsList">
+                        <!-- Populated by JavaScript -->
+                    </ul>
+                </div>
+
+                <!-- Areas for Improvement Card -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Areas for Improvement</h3>
+                    </div>
+                    <ul class="metric-list" id="improvementsList">
+                        <!-- Populated by JavaScript -->
+                    </ul>
+                </div>
+
+                        <!-- Recommendations Card -->
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <h3>Recommendations</h3>
+                            </div>
+                            <ul class="metric-list" id="recommendationsList">
+                                <!-- Populated by JavaScript -->
+                            </ul>
+                        </div>
+
+                        <!-- Next Steps Card -->
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <h3>Next Steps</h3>
+                            </div>
+                            <ul class="metric-list" id="nextStepsList">
+                                <!-- Populated by JavaScript -->
+                            </ul>
+                        </div>
+
+
+            </div>
+            </div>
+
+            <!-- Right Side Charts -->
+            <div class="right-charts">
+                <!-- Bar Chart Section -->
+                <div class="chart-section">
+                    <h3>Detailed Scores</h3>
+                    <div class="chart-container">
+                        <canvas id="scoresChart"></canvas>
+                    </div>
+                </div>
+                
+                        <!-- Benchmark Section -->
+                        <div class="chart-section">
+                            <h3>Similar Startups</h3>
+                            <div class="benchmark-scroll">
+                                <div class="benchmark-item">
+                                    <div class="benchmark-icon success">✓</div>
+                                    <div class="benchmark-content">
+                                        <h4>TechFlow (Series A, $15M raised)</h4>
+                                        <p>Similar clarity score and market timing. Strong execution focus led to successful Series A.</p>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <div class="benchmark-icon warning">⚠</div>
+                                    <div class="benchmark-content">
+                                        <h4>DataSync (Failed in 2 years)</h4>
+                                        <p>Weak go-to-market strategy despite good product. Poor customer acquisition led to failure.</p>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <div class="benchmark-icon success">✓</div>
+                                    <div class="benchmark-content">
+                                        <h4>CloudBase (Acquired for $50M)</h4>
+                                        <p>Strong differentiation and market fit. Focused on enterprise customers from day one.</p>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <div class="benchmark-icon warning">⚠</div>
+                                    <div class="benchmark-content">
+                                        <h4>StartupX (Seed stage, struggling)</h4>
+                                        <p>Good product but poor market timing. Failed to adapt to changing customer needs.</p>
+                                    </div>
+                                </div>
+                                <div class="benchmark-item">
+                                    <div class="benchmark-icon success">✓</div>
+                                    <div class="benchmark-content">
+                                        <h4>InnovateCorp (IPO, $2B valuation)</h4>
+                                        <p>Exceptional market fit and execution. Built strong competitive moats early on.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            </div>
+            
+            <!-- AI Button -->
+            <button class="ai-button" id="aiButton" onclick="openAIChat()">
+                💬
+            </button>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Validation Questions</title>
+    <link rel="stylesheet" href="questions.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <div class="container">
+            <header class="header">
+                <h1>Startup Validation</h1>
+                <p class="subtitle">
+                    Answer these deep questions to validate your startup idea
+                </p>
+                <div class="progress-indicator">
+                    <span class="progress-text">
+                        <span id="filledCount">0</span>/10 questions answered
+                    </span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="questions-container" id="questionsContainer">
+                <!-- Questions will be populated by JavaScript -->
+            </div>
+
+            <div class="evaluate-section">
+                <button class="evaluate-button disabled" id="evaluateButton" onclick="handleEvaluate()">
+                    <span id="buttonText">Evaluate</span>
+                    <span class="button-icon" id="buttonIcon">→</span>
+                </button>
+                
+                <p class="validation-message" id="validationMessage" style="display: none;">
+                    Please answer at least 7 questions to evaluate your startup
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+</body>
+</html>
