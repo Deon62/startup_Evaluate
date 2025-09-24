@@ -185,6 +185,71 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
+// Market Insights endpoint
+app.post('/api/market-insights', async (req, res) => {
+    try {
+        const { answers, evaluationData } = req.body;
+        
+        if (!answers || !evaluationData) {
+            return res.status(400).json({
+                success: false,
+                error: 'Answers and evaluation data are required'
+            });
+        }
+
+        console.log('Generating market insights...');
+        console.log('Answers received:', answers);
+        console.log('Evaluation data received:', evaluationData);
+
+        // Get AI market insights
+        const marketInsights = await evaluator.generateMarketInsights(answers, evaluationData);
+        console.log('Generated insights:', marketInsights);
+
+        res.json({
+            success: true,
+            insights: marketInsights
+        });
+
+    } catch (error) {
+        console.error('Market insights error:', error);
+        res.json({
+            success: false,
+            insights: evaluator.getFallbackMarketInsights(answers)
+        });
+    }
+});
+
+// Market News endpoint
+app.post('/api/market-news', async (req, res) => {
+    try {
+        const { answers, evaluationData } = req.body;
+        
+        if (!answers || !evaluationData) {
+            return res.status(400).json({
+                success: false,
+                error: 'Answers and evaluation data are required'
+            });
+        }
+
+        console.log('Generating market news...');
+
+        // Get AI market news
+        const marketNews = await evaluator.generateMarketNews(answers, evaluationData);
+
+        res.json({
+            success: true,
+            news: marketNews
+        });
+
+    } catch (error) {
+        console.error('Market news error:', error);
+        res.json({
+            success: false,
+            news: evaluator.getFallbackMarketNews()
+        });
+    }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ 

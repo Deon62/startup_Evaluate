@@ -108,8 +108,9 @@ async function handleEvaluate() {
 
         const result = await response.json();
         
-        // Store evaluation data in localStorage and redirect to dashboard
+        // Store evaluation data and answers in localStorage
         localStorage.setItem('evaluationData', JSON.stringify(result));
+        localStorage.setItem('startupAnswers', JSON.stringify(answers));
         window.location.href = 'dashboard.html';
         
     } catch (error) {

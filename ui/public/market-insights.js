@@ -2,6 +2,32 @@
 
 let isLoading = false;
 
+// Get evaluation data from localStorage
+function getEvaluationData() {
+    try {
+        const stored = localStorage.getItem('evaluationData');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error('Error parsing evaluation data:', error);
+    }
+    return null;
+}
+
+// Get answers from localStorage
+function getAnswers() {
+    try {
+        const stored = localStorage.getItem('startupAnswers');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error('Error parsing answers:', error);
+    }
+    return [];
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadMarketInsights();
 });
@@ -60,16 +86,42 @@ async function loadMarketInsights() {
         insightsGrid.style.display = 'none';
         noInsights.style.display = 'none';
         
-        // Simulate API call to get market insights
-        const insights = await fetchMarketInsights(evaluationData);
+        // Get answers for API calls
+        const answers = getAnswers();
+        
+        // Load real-time insights from API
+        let insights;
+        try {
+            console.log('Fetching real-time insights with answers:', answers);
+            console.log('Evaluation data:', evaluationData);
+            
+            const insightsResponse = await fetch('/api/market-insights', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    answers: answers,
+                    evaluationData: evaluationData
+                })
+            });
+            
+            const insightsResult = await insightsResponse.json();
+            console.log('Insights API response:', insightsResult);
+            
+            insights = insightsResult.success ? insightsResult.insights : await fetchMarketInsights(evaluationData);
+        } catch (error) {
+            console.error('Error fetching real-time insights:', error);
+            insights = await fetchMarketInsights(evaluationData);
+        }
         
         if (insights && insights.length > 0) {
             displayInsights(insights);
             loadingState.style.display = 'none';
             insightsGrid.style.display = 'grid';
             
-            // Load market news
-            await loadMarketNews();
+            // Load real-time market news
+            await loadMarketNews(answers, evaluationData);
         } else {
             loadingState.style.display = 'none';
             noInsights.style.display = 'flex';
@@ -204,13 +256,37 @@ async function refreshInsights() {
 }
 
 // Load market news
-async function loadMarketNews() {
+async function loadMarketNews(answers, evaluationData) {
     const marketNewsSection = document.getElementById('marketNewsSection');
     const newsGrid = document.getElementById('newsGrid');
     
     try {
-        // Generate mock market news
-        const news = generateMockNews();
+        let news;
+        
+        // Try to get real-time news from API
+        if (answers && evaluationData) {
+            try {
+                const newsResponse = await fetch('/api/market-news', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        answers: answers,
+                        evaluationData: evaluationData
+                    })
+                });
+                
+                const newsResult = await newsResponse.json();
+                news = newsResult.success ? newsResult.news : generateMockNews();
+            } catch (error) {
+                console.error('Error fetching real-time news:', error);
+                news = generateMockNews();
+            }
+        } else {
+            news = generateMockNews();
+        }
+        
         displayNews(news);
         marketNewsSection.style.display = 'block';
     } catch (error) {
