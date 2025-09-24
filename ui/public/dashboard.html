@@ -10,17 +10,44 @@
 </head>
 <body>
     <div class="dashboard">
-        <div class="dashboard-container">
-            <div class="dashboard-main">
-                <header class="dashboard-header">
-                    <button class="back-button" onclick="goBack()">
-                        ← Back to Questions
-                    </button>
-                    <h1>Evaluation Results</h1>
-                    <button class="export-button" onclick="exportToPDF()">
-                        Export Report
-                    </button>
-                </header>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Evalio</h3>
+                <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/index.html" class="nav-link">
+                    <span class="nav-text">Home</span>
+                </a>
+                <a href="/questions.html" class="nav-link">
+                    <span class="nav-text">Questions</span>
+                </a>
+                <a href="#" class="nav-link active">
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="dashboard-container">
+                <div class="dashboard-main">
+                    <header class="dashboard-header">
+                        <button class="menu-toggle" onclick="toggleSidebar()">
+                            <span class="menu-icon">☰</span>
+                        </button>
+                        <h1>Evaluation Results</h1>
+                        <button class="export-button" onclick="exportToPDF()">
+                            Export Report
+                        </button>
+                    </header>
 
             <div class="metrics-grid">
                 <!-- Overall Score Card -->
@@ -202,6 +229,7 @@
             <button class="ai-button" id="aiButton" onclick="openAIChat()">
                 💬
             </button>
+        </div>
         </div>
     </div>
 
