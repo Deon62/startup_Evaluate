@@ -1,0 +1,24 @@
+{
+  "name": "yc",
+  "version": "1.0.0",
+  "description": "A comprehensive startup validation tool that helps entrepreneurs evaluate their business ideas through 10 deep, strategic questions.",
+  "main": "setup-env.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deon62/startup_Evaluate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Deon62/startup_Evaluate/issues"
+  },
+  "homepage": "https://github.com/Deon62/startup_Evaluate#readme",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "dotenv": "^17.2.2"
+  }
+}
