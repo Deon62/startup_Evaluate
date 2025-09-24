@@ -69,23 +69,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get evaluation data from localStorage or use mock data
     const evaluationData = getEvaluationData();
     
-    // Populate the dashboard
-    populateDashboard(evaluationData);
+    // Show skeleton loading first
+    showSkeletonLoading();
     
-    // Create charts
-    createOverallScoreChart(evaluationData.evaluation.overallScore);
-    populateMetricCards();
+    // Populate basic scores immediately (progressive disclosure)
+    setTimeout(() => {
+        populateBasicScores(evaluationData);
+    }, 500);
     
-    // Create initial chart with mock data, then update with real data if available
-    createScoresChart();
+    // Then populate detailed analysis
+    setTimeout(() => {
+        populateDetailedAnalysis(evaluationData);
+    }, 1500);
     
-    // Force update chart with AI data if available
-    if (evaluationData.evaluation.individualScores) {
-        console.log('Force updating chart with AI data:', evaluationData.evaluation.individualScores);
-        setTimeout(() => {
-            updateScoresChart(evaluationData.evaluation.individualScores);
-        }, 100);
-    }
+    // Finally populate charts and complete the experience
+    setTimeout(() => {
+        populateCharts(evaluationData);
+        hideSkeletonLoading();
+    }, 2500);
 });
 
 function getEvaluationData() {
@@ -100,6 +101,210 @@ function getEvaluationData() {
     
     // Return mock data if no stored data
     return mockEvaluationData;
+}
+
+// Show skeleton loading placeholders
+function showSkeletonLoading() {
+    const skeletonHTML = `
+        <div class="skeleton-overlay">
+            <div class="skeleton-content">
+                <div class="skeleton-header">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-button"></div>
+                </div>
+                <div class="skeleton-grid">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+                <div class="skeleton-charts">
+                    <div class="skeleton-chart"></div>
+                    <div class="skeleton-chart"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const skeletonElement = document.createElement('div');
+    skeletonElement.id = 'skeletonLoading';
+    skeletonElement.innerHTML = skeletonHTML;
+    document.body.appendChild(skeletonElement);
+    
+    // Add skeleton styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .skeleton-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FFFFFF;
+            z-index: 9999;
+            padding: 1rem;
+        }
+        
+        .skeleton-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .skeleton-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .skeleton-title {
+            width: 300px;
+            height: 40px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        .skeleton-button {
+            width: 120px;
+            height: 40px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .skeleton-card {
+            height: 150px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        .skeleton-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .skeleton-chart {
+            height: 300px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
+
+// Hide skeleton loading
+function hideSkeletonLoading() {
+    const skeleton = document.getElementById('skeletonLoading');
+    if (skeleton) {
+        skeleton.style.opacity = '0';
+        skeleton.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            skeleton.remove();
+        }, 500);
+    }
+}
+
+// Populate basic scores first (progressive disclosure)
+function populateBasicScores(evaluationData) {
+    if (!evaluationData || !evaluationData.evaluation) return;
+    
+    const evaluation = evaluationData.evaluation;
+    
+    // Update overall score immediately
+    document.getElementById('overallScoreValue').textContent = evaluation.overallScore;
+    
+    // Create overall score chart
+    createOverallScoreChart(evaluation.overallScore);
+    
+    // Update metric cards with basic data
+    populateMetricCards();
+}
+
+// Populate detailed analysis
+function populateDetailedAnalysis(evaluationData) {
+    if (!evaluationData || !evaluationData.evaluation) return;
+    
+    const evaluation = evaluationData.evaluation;
+    
+    // Update metric cards with AI data if available
+    if (evaluation.businessValuation) {
+        metricData.businessValuation = evaluation.businessValuation;
+    }
+    if (evaluation.fundingReadiness) {
+        metricData.fundingReadiness = evaluation.fundingReadiness;
+    }
+    if (evaluation.marketMomentum) {
+        metricData.marketMomentum = evaluation.marketMomentum;
+    }
+    if (evaluation.riskExposure) {
+        metricData.riskExposure = evaluation.riskExposure;
+    }
+    populateMetricCards();
+    
+    // Populate lists
+    populateList('strengthsList', evaluation.strengths);
+    populateList('improvementsList', evaluation.concerns);
+    populateList('recommendationsList', evaluation.recommendations);
+    
+    // Handle next steps
+    const nextSteps = evaluation.nextSteps || (evaluation.nextQuestion ? [evaluation.nextQuestion] : []);
+    populateList('nextStepsList', nextSteps);
+    
+    // Update pattern match if available
+    if (evaluation.patternMatch) {
+        updatePatternMatch(evaluation.patternMatch);
+    }
+    
+    // Update similar startups if available
+    if (evaluation.similarStartups && evaluation.similarStartups.length > 0) {
+        updateSimilarStartups(evaluation.similarStartups);
+    } else if (evaluation.patternMatch) {
+        updateSimilarStartupsFromPatternMatch(evaluation.patternMatch);
+    }
+}
+
+// Populate charts
+function populateCharts(evaluationData) {
+    if (!evaluationData || !evaluationData.evaluation) return;
+    
+    const evaluation = evaluationData.evaluation;
+    
+    // Create initial chart with mock data, then update with real data if available
+    createScoresChart();
+    
+    // Force update chart with AI data if available
+    if (evaluation.individualScores) {
+        console.log('Force updating chart with AI data:', evaluation.individualScores);
+        setTimeout(() => {
+            updateScoresChart(evaluation.individualScores);
+        }, 100);
+    }
 }
 
 function populateDashboard(data) {
