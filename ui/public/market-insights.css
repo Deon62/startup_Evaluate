@@ -1,0 +1,590 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: #0F172A;
+    background-color: #FFFFFF;
+    min-height: 100vh;
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #FAFBFF;
+    border-right: 1px solid #E5E7EB;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 1rem;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FFFFFF;
+}
+
+.sidebar-header h3 {
+    color: #F97316;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-sidebar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6B7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.close-sidebar:hover {
+    background-color: #F3F4F6;
+    color: #F97316;
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #6B7280;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+    background-color: #F3F4F6;
+    color: #F97316;
+}
+
+.nav-link.active {
+    background-color: #FEF3F2;
+    color: #F97316;
+    border-left-color: #F97316;
+}
+
+.nav-text {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.sidebar-open {
+    margin-left: 250px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1rem;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #0F172A;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+
+.menu-toggle:hover {
+    color: #6B7280;
+}
+
+.menu-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.header-content {
+    flex: 1;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #6B7280;
+    margin: 0;
+}
+
+.refresh-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #F97316;
+    border: 2px solid #F97316;
+    color: white;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.refresh-button:hover {
+    background-color: #EA580C;
+    border-color: #EA580C;
+    transform: translateY(-1px);
+}
+
+.refresh-icon {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.refresh-button.loading .refresh-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Insights Container */
+.insights-container {
+    min-height: 500px;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #E5E7EB;
+    border-top: 3px solid #F97316;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.loading-state p {
+    color: #6B7280;
+    font-size: 1rem;
+}
+
+/* No Insights State */
+.no-insights {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+.no-insights-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.no-insights h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0F172A;
+    margin-bottom: 0.5rem;
+}
+
+.no-insights p {
+    color: #6B7280;
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #F97316;
+    border: 2px solid #F97316;
+    color: white;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.cta-button:hover {
+    background-color: #EA580C;
+    border-color: #EA580C;
+    transform: translateY(-1px);
+}
+
+/* Insights Grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 100%;
+}
+
+/* Insight Card */
+.insight-card {
+    background-color: #FAFBFF;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.insight-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.startup-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0F172A;
+    margin: 0;
+}
+
+.funding-badge {
+    background: #F97316;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.funding-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #F97316;
+    margin-bottom: 0.5rem;
+}
+
+.funding-round {
+    font-size: 0.9rem;
+    color: #6B7280;
+    margin-bottom: 1rem;
+}
+
+.insight-text {
+    font-size: 0.95rem;
+    color: #0F172A;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.insight-highlight {
+    background: #FEF3F2;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border-left: 3px solid #F97316;
+    margin-top: 1rem;
+}
+
+.insight-highlight strong {
+    color: #F97316;
+    font-weight: 600;
+}
+
+/* Market News Section */
+.market-news-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #6B7280;
+    margin: 0;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    max-width: 100%;
+}
+
+/* News Card */
+.news-card {
+    background-color: #FAFBFF;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.news-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.news-source {
+    font-size: 0.8rem;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.news-date {
+    font-size: 0.75rem;
+    color: #9CA3AF;
+}
+
+.news-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0F172A;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.news-summary {
+    font-size: 0.9rem;
+    color: #4B5563;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.news-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.news-tag {
+    background: #F3F4F6;
+    color: #6B7280;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.news-tag.funding {
+    background: #FEF3F2;
+    color: #F97316;
+}
+
+.news-tag.healthcare {
+    background: #F0FDF4;
+    color: #16A34A;
+}
+
+.news-tag.tech {
+    background: #EFF6FF;
+    color: #2563EB;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.8rem 0.8rem;
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .insights-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .insight-card {
+        padding: 1rem;
+    }
+    
+    .news-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .news-card {
+        padding: 1rem;
+    }
+    
+    /* Sidebar mobile styles */
+    .sidebar {
+        width: 280px;
+        left: -280px;
+    }
+    
+    .main-content.sidebar-open {
+        margin-left: 0;
+    }
+    
+    .sidebar.open {
+        left: 0;
+    }
+    
+    .menu-toggle {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .menu-icon {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.6rem 0.6rem;
+    }
+    
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .insight-card {
+        padding: 0.8rem;
+    }
+    
+    .startup-name {
+        font-size: 1rem;
+    }
+    
+    .funding-amount {
+        font-size: 1.1rem;
+    }
+    
+    .news-card {
+        padding: 0.8rem;
+    }
+    
+    .news-title {
+        font-size: 1rem;
+    }
+    
+    /* Sidebar mobile styles */
+    .sidebar {
+        width: 260px;
+        left: -260px;
+    }
+    
+    .main-content.sidebar-open {
+        margin-left: 0;
+    }
+    
+    .sidebar.open {
+        left: 0;
+    }
+    
+    .menu-toggle {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .menu-icon {
+        font-size: 0.9rem;
+    }
+}
