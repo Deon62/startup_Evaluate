@@ -6,6 +6,7 @@
     <title>My Projects - Evalio</title>
     <link rel="stylesheet" href="my-projects.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="app">
@@ -84,7 +85,6 @@
                     <div class="projects-grid" id="projectsGrid">
                         <!-- Projects will be loaded here -->
                         <div class="no-projects" id="noProjects">
-                            <div class="no-projects-icon">📊</div>
                             <h3>No projects yet</h3>
                             <p>Start your first startup evaluation to see your projects here.</p>
                             <button class="cta-button" onclick="startNewEvaluation()">

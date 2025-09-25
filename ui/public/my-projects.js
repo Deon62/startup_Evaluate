@@ -15,6 +15,12 @@ function loadProjects() {
         const storedProjects = localStorage.getItem('userProjects');
         if (storedProjects) {
             projects = JSON.parse(storedProjects);
+            // Ensure each project has a unique ID
+            projects.forEach((project, index) => {
+                if (!project.id) {
+                    project.id = `project_${Date.now()}_${index}`;
+                }
+            });
         }
         renderProjects();
         updateStats();
@@ -26,6 +32,9 @@ function loadProjects() {
 
 // Render projects in the grid
 function renderProjects() {
+    console.log('Rendering projects, count:', projects.length);
+    console.log('Projects data:', projects);
+    
     const projectsGrid = document.getElementById('projectsGrid');
     const noProjects = document.getElementById('noProjects');
     
@@ -38,8 +47,8 @@ function renderProjects() {
     
     noProjects.style.display = 'none';
     
-    projectsGrid.innerHTML = projects.map((project, index) => `
-        <div class="project-card" onclick="viewProject(${index})">
+    projectsGrid.innerHTML = projects.map((project) => `
+        <div class="project-card" data-project-id="${project.id}">
             <div class="project-header">
                 <div>
                     <h3 class="project-title">${project.name || 'Untitled Project'}</h3>
@@ -54,13 +63,13 @@ function renderProjects() {
                     <span>Completed</span>
                 </div>
                 <div class="project-actions">
-                    <button class="action-btn" onclick="event.stopPropagation(); viewProject(${index})" title="View Details">
+                    <button class="action-btn view-btn" data-project-id="${project.id}" title="View Details">
                         👁️
                     </button>
-                    <button class="action-btn" onclick="event.stopPropagation(); exportProject(${index})" title="Export">
+                    <button class="action-btn export-btn" data-project-id="${project.id}" title="Export">
                         📄
                     </button>
-                    <button class="action-btn" onclick="event.stopPropagation(); deleteProject(${index})" title="Delete">
+                    <button class="action-btn delete-btn" data-project-id="${project.id}" title="Delete">
                         🗑️
                     </button>
                 </div>
@@ -96,38 +105,296 @@ function formatDate(dateString) {
 }
 
 // View project details
-function viewProject(index) {
-    const project = projects[index];
+function viewProject(projectId) {
+    console.log('viewProject called with projectId:', projectId);
+    const project = projects.find(p => p.id === projectId);
     if (project) {
+        console.log('Project found:', project);
         // Store the project data for the dashboard
         localStorage.setItem('currentProject', JSON.stringify(project));
         // Redirect to dashboard
-        window.location.href = '/dashboard.html';
+        window.location.href = 'dashboard.html';
+    } else {
+        console.log('No project found with ID:', projectId);
     }
 }
 
 // Export project as PDF
-function exportProject(index) {
-    const project = projects[index];
-    if (!project) return;
+function exportProject(projectId) {
+    console.log('exportProject called with projectId:', projectId);
+    const project = projects.find(p => p.id === projectId);
+    if (!project) {
+        console.log('No project found with ID:', projectId);
+        return;
+    }
+    console.log('Project found for export:', project);
     
-    // Create a simple text export for now
-    const exportData = {
-        name: project.name || 'Untitled Project',
-        description: project.description || 'No description',
-        overallScore: project.overallScore || 0,
-        createdAt: formatDate(project.createdAt),
-        answers: project.answers || [],
-        evaluation: project.evaluation || {}
-    };
+    // Check if jsPDF is available
+    if (typeof window.jsPDF === 'undefined') {
+        console.error('jsPDF is not loaded, using fallback export');
+        exportProjectAsText(project);
+        return;
+    }
     
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
+    try {
+        const { jsPDF } = window.jsPDF;
+        const doc = new jsPDF();
     
+    // Set up colors
+    const primaryColor = '#F97316';
+    const textColor = '#1F2937';
+    const mutedColor = '#6B7280';
+    
+    // Page setup
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    let yPosition = margin;
+    
+    // Title
+    doc.setFontSize(24);
+    doc.setTextColor(primaryColor);
+    doc.text('Evalio - Startup Evaluation Report', margin, yPosition);
+    yPosition += 15;
+    
+    // Project name
+    doc.setFontSize(18);
+    doc.setTextColor(textColor);
+    doc.text(project.name || 'Untitled Project', margin, yPosition);
+    yPosition += 10;
+    
+    // Date and score
+    doc.setFontSize(12);
+    doc.setTextColor(mutedColor);
+    doc.text(`Generated on: ${formatDate(project.createdAt)}`, margin, yPosition);
+    yPosition += 8;
+    doc.text(`Overall Score: ${project.overallScore || 0}/100`, margin, yPosition);
+    yPosition += 15;
+    
+    // Description
+    if (project.description && project.description !== 'No description available') {
+        doc.setFontSize(14);
+        doc.setTextColor(textColor);
+        doc.text('Project Description:', margin, yPosition);
+        yPosition += 8;
+        
+        doc.setFontSize(11);
+        doc.setTextColor(mutedColor);
+        const descriptionLines = doc.splitTextToSize(project.description, pageWidth - 2 * margin);
+        doc.text(descriptionLines, margin, yPosition);
+        yPosition += descriptionLines.length * 5 + 10;
+    }
+    
+    // Answers section
+    if (project.answers && project.answers.length > 0) {
+        doc.setFontSize(14);
+        doc.setTextColor(textColor);
+        doc.text('Your Answers:', margin, yPosition);
+        yPosition += 10;
+        
+        const questions = [
+            "What is your unique value proposition?",
+            "What's your unfair competitive advantage?",
+            "Who is your customer, really?",
+            "Why now? What market shifts make this the right moment?",
+            "What critical problem are you solving?",
+            "What would stop this idea from succeeding?",
+            "If your product disappeared tomorrow, what would customers miss?",
+            "How will you make money?",
+            "What is your long-term vision?",
+            "Why you? What makes you the right team?"
+        ];
+        
+        project.answers.forEach((answer, index) => {
+            if (answer && answer.trim()) {
+                // Check if we need a new page
+                if (yPosition > pageHeight - 40) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                
+                doc.setFontSize(12);
+                doc.setTextColor(textColor);
+                doc.text(`${index + 1}. ${questions[index] || `Question ${index + 1}`}`, margin, yPosition);
+                yPosition += 6;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(mutedColor);
+                const answerLines = doc.splitTextToSize(answer, pageWidth - 2 * margin);
+                doc.text(answerLines, margin, yPosition);
+                yPosition += answerLines.length * 4 + 8;
+            }
+        });
+    }
+    
+    // Evaluation results
+    if (project.evaluation && project.evaluation.evaluation) {
+        const evaluation = project.evaluation.evaluation;
+        
+        // Check if we need a new page
+        if (yPosition > pageHeight - 60) {
+            doc.addPage();
+            yPosition = margin;
+        }
+        
+        doc.setFontSize(14);
+        doc.setTextColor(textColor);
+        doc.text('Evaluation Results:', margin, yPosition);
+        yPosition += 10;
+        
+        // Strengths
+        if (evaluation.strengths && evaluation.strengths.length > 0) {
+            doc.setFontSize(12);
+            doc.setTextColor(primaryColor);
+            doc.text('Strengths:', margin, yPosition);
+            yPosition += 6;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(mutedColor);
+            evaluation.strengths.forEach(strength => {
+                if (yPosition > pageHeight - 20) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                doc.text(`• ${strength}`, margin + 5, yPosition);
+                yPosition += 5;
+            });
+            yPosition += 5;
+        }
+        
+        // Concerns
+        if (evaluation.concerns && evaluation.concerns.length > 0) {
+            doc.setFontSize(12);
+            doc.setTextColor('#DC2626');
+            doc.text('Areas for Improvement:', margin, yPosition);
+            yPosition += 6;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(mutedColor);
+            evaluation.concerns.forEach(concern => {
+                if (yPosition > pageHeight - 20) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                doc.text(`• ${concern}`, margin + 5, yPosition);
+                yPosition += 5;
+            });
+            yPosition += 5;
+        }
+        
+        // Recommendations
+        if (evaluation.recommendations && evaluation.recommendations.length > 0) {
+            doc.setFontSize(12);
+            doc.setTextColor('#059669');
+            doc.text('Recommendations:', margin, yPosition);
+            yPosition += 6;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(mutedColor);
+            evaluation.recommendations.forEach(recommendation => {
+                if (yPosition > pageHeight - 20) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                doc.text(`• ${recommendation}`, margin + 5, yPosition);
+                yPosition += 5;
+            });
+        }
+    }
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(mutedColor);
+    doc.text('Generated by Evalio - Startup Validation Platform', margin, pageHeight - 10);
+    doc.text('Visit us at your-domain.com', pageWidth - margin - 30, pageHeight - 10);
+    
+        // Save the PDF
+        const fileName = `${(project.name || 'Untitled Project').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_evaluation.pdf`;
+        doc.save(fileName);
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Using text export instead.');
+        exportProjectAsText(project);
+    }
+}
+
+// Fallback text export function
+function exportProjectAsText(project) {
+    const questions = [
+        "What is your unique value proposition?",
+        "What's your unfair competitive advantage?",
+        "Who is your customer, really?",
+        "Why now? What market shifts make this the right moment?",
+        "What critical problem are you solving?",
+        "What would stop this idea from succeeding?",
+        "If your product disappeared tomorrow, what would customers miss?",
+        "How will you make money?",
+        "What is your long-term vision?",
+        "Why you? What makes you the right team?"
+    ];
+    
+    let textContent = `EVALIO - STARTUP EVALUATION REPORT\n`;
+    textContent += `=====================================\n\n`;
+    textContent += `Project: ${project.name || 'Untitled Project'}\n`;
+    textContent += `Date: ${formatDate(project.createdAt)}\n`;
+    textContent += `Overall Score: ${project.overallScore || 0}/100\n\n`;
+    
+    if (project.description && project.description !== 'No description available') {
+        textContent += `DESCRIPTION:\n${project.description}\n\n`;
+    }
+    
+    if (project.answers && project.answers.length > 0) {
+        textContent += `YOUR ANSWERS:\n`;
+        textContent += `=============\n\n`;
+        
+        project.answers.forEach((answer, index) => {
+            if (answer && answer.trim()) {
+                textContent += `${index + 1}. ${questions[index] || `Question ${index + 1}`}\n`;
+                textContent += `Answer: ${answer}\n\n`;
+            }
+        });
+    }
+    
+    if (project.evaluation && project.evaluation.evaluation) {
+        const evaluation = project.evaluation.evaluation;
+        textContent += `EVALUATION RESULTS:\n`;
+        textContent += `==================\n\n`;
+        
+        if (evaluation.strengths && evaluation.strengths.length > 0) {
+            textContent += `STRENGTHS:\n`;
+            evaluation.strengths.forEach(strength => {
+                textContent += `• ${strength}\n`;
+            });
+            textContent += `\n`;
+        }
+        
+        if (evaluation.concerns && evaluation.concerns.length > 0) {
+            textContent += `AREAS FOR IMPROVEMENT:\n`;
+            evaluation.concerns.forEach(concern => {
+                textContent += `• ${concern}\n`;
+            });
+            textContent += `\n`;
+        }
+        
+        if (evaluation.recommendations && evaluation.recommendations.length > 0) {
+            textContent += `RECOMMENDATIONS:\n`;
+            evaluation.recommendations.forEach(recommendation => {
+                textContent += `• ${recommendation}\n`;
+            });
+            textContent += `\n`;
+        }
+    }
+    
+    textContent += `\nGenerated by Evalio - Startup Validation Platform\n`;
+    textContent += `Visit us at your-domain.com\n`;
+    
+    // Create and download text file
+    const blob = new Blob([textContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${exportData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_evaluation.json`;
+    link.download = `${(project.name || 'Untitled Project').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_evaluation.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -135,12 +402,19 @@ function exportProject(index) {
 }
 
 // Delete project
-function deleteProject(index) {
+function deleteProject(projectId) {
+    console.log('deleteProject called with projectId:', projectId);
     if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-        projects.splice(index, 1);
-        saveProjects();
-        renderProjects();
-        updateStats();
+        const projectIndex = projects.findIndex(p => p.id === projectId);
+        if (projectIndex !== -1) {
+            projects.splice(projectIndex, 1);
+            saveProjects();
+            renderProjects();
+            updateStats();
+            console.log('Project deleted successfully');
+        } else {
+            console.log('Project not found for deletion');
+        }
     }
 }
 
@@ -252,6 +526,48 @@ function setupEventListeners() {
             dropdown.style.display = 'none';
         }
     });
+    
+    // Handle project card clicks and button clicks
+    document.addEventListener('click', function(event) {
+        console.log('Click event detected:', event.target);
+        
+        // Handle project card clicks
+        if (event.target.closest('.project-card')) {
+            const card = event.target.closest('.project-card');
+            const projectId = card.getAttribute('data-project-id');
+            console.log('Project card clicked, ID:', projectId);
+            
+            // If clicking on the card itself (not on buttons), view the project
+            if (!event.target.closest('.project-actions')) {
+                console.log('Card body clicked, viewing project');
+                viewProject(projectId);
+            }
+        }
+        
+        // Handle view button clicks
+        if (event.target.classList.contains('view-btn')) {
+            event.stopPropagation();
+            const projectId = event.target.getAttribute('data-project-id');
+            console.log('View button clicked, ID:', projectId);
+            viewProject(projectId);
+        }
+        
+        // Handle export button clicks
+        if (event.target.classList.contains('export-btn')) {
+            event.stopPropagation();
+            const projectId = event.target.getAttribute('data-project-id');
+            console.log('Export button clicked, ID:', projectId);
+            exportProject(projectId);
+        }
+        
+        // Handle delete button clicks
+        if (event.target.classList.contains('delete-btn')) {
+            event.stopPropagation();
+            const projectId = event.target.getAttribute('data-project-id');
+            console.log('Delete button clicked, ID:', projectId);
+            deleteProject(projectId);
+        }
+    });
 }
 
 // Check if user is authenticated
@@ -264,9 +580,25 @@ function checkAuthentication() {
     return true;
 }
 
+// Check if jsPDF is loaded
+function checkJsPDF() {
+    if (typeof window.jsPDF === 'undefined') {
+        console.warn('jsPDF not loaded yet, retrying...');
+        setTimeout(checkJsPDF, 1000);
+    } else {
+        console.log('jsPDF loaded successfully');
+    }
+}
+
 // Initialize authentication check
 document.addEventListener('DOMContentLoaded', function() {
     if (!checkAuthentication()) {
         return;
     }
+    
+    // Initialize page components
+    loadProjects();
+    initializeProfile();
+    setupEventListeners();
+    checkJsPDF();
 });

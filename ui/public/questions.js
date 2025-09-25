@@ -87,8 +87,11 @@ async function handleEvaluate() {
     
     isLoading = true;
     
+    // Record start time
+    const startTime = Date.now();
+    
     // Create loading overlay with progressive feedback
-    createLoadingOverlay();
+    createLoadingOverlay(startTime);
     
     // Update button to loading state
     const evaluateButton = document.getElementById('evaluateButton');
@@ -132,6 +135,13 @@ async function handleEvaluate() {
         
     } catch (error) {
         console.error('Error evaluating startup:', error);
+        
+        // Clear the timer
+        if (window.evaluationTimer) {
+            clearInterval(window.evaluationTimer);
+            window.evaluationTimer = null;
+        }
+        
         hideLoadingOverlay();
         alert('Failed to evaluate your startup. Please try again.');
         
@@ -146,7 +156,7 @@ async function handleEvaluate() {
 }
 
 // Create engaging loading overlay with progressive feedback
-function createLoadingOverlay() {
+function createLoadingOverlay(startTime) {
     const overlay = document.createElement('div');
     overlay.id = 'loadingOverlay';
     overlay.innerHTML = `
@@ -170,8 +180,14 @@ function createLoadingOverlay() {
                 </div>
             </div>
             <div class="estimated-time">
-                <span class="time-icon">•</span>
-                <span class="time-text">Estimated time: 15-30 seconds</span>
+                <span class="time-icon">⏱️</span>
+                <span class="time-text">Estimated time: 1-2 minutes</span>
+            </div>
+            <div class="elapsed-time">
+                <span class="elapsed-text">Elapsed: <span id="elapsedTime">0s</span></span>
+            </div>
+            <div class="time-info">
+                <span class="info-text">Our AI is conducting a comprehensive analysis of your startup idea. This thorough evaluation ensures you get the most accurate insights.</span>
             </div>
         </div>
     `;
@@ -338,12 +354,66 @@ function createLoadingOverlay() {
             font-size: 1rem;
             color: #F97316;
         }
+        
+        .elapsed-time {
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        
+        .elapsed-text {
+            font-size: 0.9rem;
+            color: #F97316;
+            font-weight: 600;
+        }
+        
+        .time-info {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .info-text {
+            font-size: 0.85rem;
+            color: #6B7280;
+            line-height: 1.4;
+            max-width: 400px;
+            margin: 0 auto;
+        }
     `;
     
     document.head.appendChild(style);
     
+    // Start timer
+    startElapsedTimer(startTime);
+    
     // Start progressive feedback
     startProgressiveFeedback();
+}
+
+// Start elapsed timer
+function startElapsedTimer(startTime) {
+    const elapsedTimeElement = document.getElementById('elapsedTime');
+    if (!elapsedTimeElement) return;
+    
+    const updateTimer = () => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        
+        if (minutes > 0) {
+            elapsedTimeElement.textContent = `${minutes}m ${seconds}s`;
+        } else {
+            elapsedTimeElement.textContent = `${seconds}s`;
+        }
+    };
+    
+    // Update immediately
+    updateTimer();
+    
+    // Update every second
+    const timerInterval = setInterval(updateTimer, 1000);
+    
+    // Store interval ID for cleanup
+    window.evaluationTimer = timerInterval;
     
     // Initialize progress bar to 0%
     setTimeout(() => {
@@ -439,6 +509,12 @@ function startProgressiveFeedback() {
 
 // Show completion message
 function showCompletionMessage() {
+    // Clear the timer
+    if (window.evaluationTimer) {
+        clearInterval(window.evaluationTimer);
+        window.evaluationTimer = null;
+    }
+    
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) {
         overlay.innerHTML = `
