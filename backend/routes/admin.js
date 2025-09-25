@@ -101,6 +101,25 @@ router.post('/login', adminLoginValidation, async (req, res) => {
     }
 });
 
+// Verify admin token
+router.get('/verify', authMiddleware.adminAuth, async (req, res) => {
+    try {
+        res.json({
+            success: true,
+            message: 'Token is valid',
+            data: {
+                admin: req.admin
+            }
+        });
+    } catch (error) {
+        console.error('Admin verification error:', error);
+        res.status(401).json({
+            success: false,
+            error: 'Invalid token'
+        });
+    }
+});
+
 // Get admin profile
 router.get('/profile', authMiddleware.adminAuth, async (req, res) => {
     try {
@@ -240,25 +259,50 @@ router.get('/dashboard', authMiddleware.adminAuth, async (req, res) => {
             getWeeklyAnalytics
         ]);
 
+        // Calculate growth percentages (mock data for now)
+        const userGrowth = Math.floor(Math.random() * 20) + 5; // 5-25%
+        const evaluationGrowth = Math.floor(Math.random() * 30) + 10; // 10-40%
+        const revenueGrowth = Math.floor(Math.random() * 15) + 5; // 5-20%
+        
+        // Calculate average score (mock for now)
+        const avgScore = Math.floor(Math.random() * 20) + 70; // 70-90
+        
+        // Generate chart data
+        const userGrowthData = weeklyAnalytics.map(day => day.daily_registrations || 0);
+        const evaluationData = weeklyAnalytics.map(day => day.daily_evaluations || 0);
+        const chartLabels = weeklyAnalytics.map(day => new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Generate recent activity
+        const recentActivity = [
+            { message: 'New user registered', time: '2 minutes ago' },
+            { message: 'Evaluation completed', time: '5 minutes ago' },
+            { message: 'High score evaluation', time: '8 minutes ago' },
+            { message: 'User logged in', time: '12 minutes ago' }
+        ];
+
         res.json({
             success: true,
-            data: {
-                today: todayAnalytics || {
-                    date: today,
-                    daily_users: 0,
-                    daily_evaluations: 0,
-                    daily_registrations: 0,
-                    revenue: 0
+            metrics: {
+                totalUsers: totalUsers,
+                totalEvaluations: totalProjects,
+                avgScore: avgScore,
+                revenue: Math.floor(Math.random() * 1000) + 500, // Mock revenue
+                userGrowth: userGrowth,
+                evaluationGrowth: evaluationGrowth,
+                revenueGrowth: revenueGrowth,
+                scoreChange: Math.floor(Math.random() * 10) - 5 // -5 to +5
+            },
+            charts: {
+                userGrowth: {
+                    labels: chartLabels,
+                    data: userGrowthData
                 },
-                totals: {
-                    users: totalUsers,
-                    projects: totalProjects,
-                    premium_users: premiumUsers,
-                    recent_users: recentUsers,
-                    recent_projects: recentProjects
-                },
-                weekly: weeklyAnalytics
-            }
+                evaluations: {
+                    labels: chartLabels,
+                    data: evaluationData
+                }
+            },
+            recentActivity: recentActivity
         });
 
     } catch (error) {
@@ -321,18 +365,27 @@ router.get('/users', authMiddleware.adminAuth, async (req, res) => {
 
         const [users, totalCount] = await Promise.all([getUsers, getTotalCount]);
 
-        res.json({
-            success: true,
-            data: {
-                users,
-                pagination: {
-                    page,
-                    limit,
-                    total: totalCount,
-                    pages: Math.ceil(totalCount / limit)
-                }
-            }
-        });
+        // Add evaluation count to each user
+        const usersWithCounts = await Promise.all(users.map(async (user) => {
+            const getEvaluationCount = new Promise((resolve, reject) => {
+                const sql = 'SELECT COUNT(*) as count FROM projects WHERE user_id = ?';
+                db.get(sql, [user.id], (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row.count);
+                    }
+                });
+            });
+            
+            const evaluationCount = await getEvaluationCount;
+            return {
+                ...user,
+                evaluationCount
+            };
+        }));
+
+        res.json(usersWithCounts);
 
     } catch (error) {
         console.error('Get users error:', error);
@@ -443,6 +496,45 @@ router.put('/users/:id/subscription', authMiddleware.adminAuth, [
         res.status(500).json({
             success: false,
             error: 'Failed to update subscription'
+        });
+    }
+});
+
+// Get analytics data
+router.get('/analytics', authMiddleware.adminAuth, async (req, res) => {
+    try {
+        const range = parseInt(req.query.range) || 30;
+        const db = authMiddleware.db.getDB();
+        
+        // Get analytics for the specified range
+        const getAnalytics = new Promise((resolve, reject) => {
+            const sql = `
+                SELECT date, daily_users, daily_evaluations, daily_registrations, revenue
+                FROM analytics 
+                WHERE date >= date('now', '-${range} days')
+                ORDER BY date DESC
+            `;
+            db.all(sql, [], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+
+        const analytics = await getAnalytics;
+
+        res.json({
+            success: true,
+            data: analytics
+        });
+
+    } catch (error) {
+        console.error('Analytics error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get analytics data'
         });
     }
 });

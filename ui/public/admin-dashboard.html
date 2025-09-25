@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Evalio</title>
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-logo">
+                <h2>Evalio Admin</h2>
+            </div>
+            
+            <nav class="admin-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#users" class="nav-item" data-section="users">
+                    <span class="nav-text">Users</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-section="analytics">
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <span class="nav-text">Settings</span>
+                </a>
+            </nav>
+            
+            <div class="admin-profile">
+                <div class="profile-info">
+                    <div class="profile-avatar">A</div>
+                    <div class="profile-details">
+                        <span class="profile-name">Admin</span>
+                        <span class="profile-role">Administrator</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleAdminLogout()">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Site overview and metrics</p>
+                </div>
+                <div class="header-right">
+                    <div class="last-updated">
+                        Last updated: <span id="lastUpdated">--</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section active">
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-content">
+                            <h3 id="totalUsers">--</h3>
+                            <p>Total Users</p>
+                            <span class="metric-change positive" id="userChange">+0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-content">
+                            <h3 id="totalEvaluations">--</h3>
+                            <p>Total Evaluations</p>
+                            <span class="metric-change positive" id="evaluationChange">+0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-content">
+                            <h3 id="avgScore">--</h3>
+                            <p>Average Score</p>
+                            <span class="metric-change neutral" id="scoreChange">--</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-content">
+                            <h3 id="revenue">--</h3>
+                            <p>Revenue</p>
+                            <span class="metric-change positive" id="revenueChange">+0%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>User Growth</h3>
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Daily Evaluations</h3>
+                        <canvas id="evaluationsChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="activity-card">
+                    <h3>Recent Activity</h3>
+                    <div id="recentActivity" class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon">👤</div>
+                            <div class="activity-content">
+                                <p>New user registered</p>
+                                <span class="activity-time">2 minutes ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Section -->
+            <div id="users-section" class="content-section">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <button class="btn-primary" onclick="refreshUsers()">Refresh</button>
+                </div>
+                
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Evaluations</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section">
+                <div class="section-header">
+                    <h2>Detailed Analytics</h2>
+                    <div class="date-range">
+                        <select id="analyticsRange">
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Evaluation Trends</h3>
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Score Distribution</h3>
+                        <canvas id="scoreDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section">
+                <div class="section-header">
+                    <h2>Admin Settings</h2>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>System Information</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Version:</span>
+                            <span class="setting-value">1.0.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Database:</span>
+                            <span class="setting-value">SQLite</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Last Backup:</span>
+                            <span class="setting-value">--</span>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>Actions</h3>
+                        <button class="btn-secondary" onclick="exportData()">Export Data</button>
+                        <button class="btn-secondary" onclick="clearCache()">Clear Cache</button>
+                        <button class="btn-danger" onclick="resetSystem()">Reset System</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>
