@@ -34,13 +34,26 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Import routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const projectRoutes = require('./routes/projects');
 
 // Initialize AI evaluator
 const evaluator = new StartupEvaluator();
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development',
+        version: '1.0.0'
+    });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/projects', projectRoutes);
 
 app.post('/api/evaluate', async (req, res) => {
     try {

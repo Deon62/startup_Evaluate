@@ -118,11 +118,11 @@ async function handleEvaluate() {
         localStorage.setItem('evaluationData', JSON.stringify(result));
         localStorage.setItem('startupAnswers', JSON.stringify(answers));
         
-        // Save project to user's projects list
+        // Save project to backend
         try {
-            saveProjectToUserProjects(result, answers);
+            await saveProjectToBackend(result, answers);
         } catch (projectError) {
-            console.error('Error saving project (non-critical):', projectError);
+            console.error('Error saving project to backend (non-critical):', projectError);
             // Don't fail the entire evaluation if project saving fails
         }
         
@@ -568,47 +568,54 @@ function hideLoadingOverlay() {
     }
 }
 
-// Save project to user's projects list
-function saveProjectToUserProjects(evaluationData, answers) {
+// Save project to backend
+async function saveProjectToBackend(evaluationData, answers) {
     try {
-        console.log('Saving project with evaluationData:', evaluationData);
-        console.log('Saving project with answers:', answers);
+        console.log('Saving project to backend with evaluationData:', evaluationData);
+        console.log('Saving project to backend with answers:', answers);
         
-        // Get existing projects
-        let userProjects = [];
-        const storedProjects = localStorage.getItem('userProjects');
-        if (storedProjects) {
-            userProjects = JSON.parse(storedProjects);
+        // Check if user is authenticated
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.log('User not authenticated, skipping project save');
+            return;
         }
+
+        // Generate project name and description
+        const projectName = generateProjectName(answers);
+        const projectDescription = generateProjectDescription(answers);
         
-        // Create new project object
-        const newProject = {
-            id: Date.now().toString(),
-            name: generateProjectName(answers),
-            description: generateProjectDescription(answers),
+        // Prepare project data
+        const projectData = {
+            name: projectName,
+            description: projectDescription,
             answers: answers,
-            evaluation: evaluationData,
-            overallScore: evaluationData?.evaluation?.overallScore || 0,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            evaluationData: evaluationData,
+            overallScore: evaluationData?.evaluation?.overallScore || 0
         };
         
-        console.log('Created new project:', newProject);
+        console.log('Sending project data to backend:', projectData);
         
-        // Add to projects list
-        userProjects.unshift(newProject); // Add to beginning of array
+        // Save to backend
+        const response = await fetch('/api/projects/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(projectData)
+        });
         
-        // Keep only last 50 projects to prevent localStorage from getting too large
-        if (userProjects.length > 50) {
-            userProjects = userProjects.slice(0, 50);
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to save project: ${response.status} ${errorText}`);
         }
         
-        // Save back to localStorage
-        localStorage.setItem('userProjects', JSON.stringify(userProjects));
+        const result = await response.json();
+        console.log('Project saved to backend successfully:', result);
         
-        console.log('Project saved successfully:', newProject.name);
     } catch (error) {
-        console.error('Error saving project:', error);
+        console.error('Error saving project to backend:', error);
         throw error; // Re-throw to be caught by the calling function
     }
 }

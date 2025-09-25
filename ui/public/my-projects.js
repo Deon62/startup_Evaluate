@@ -9,24 +9,44 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
 });
 
-// Load projects from localStorage
-function loadProjects() {
+// Load projects from backend
+async function loadProjects() {
     try {
-        const storedProjects = localStorage.getItem('userProjects');
-        if (storedProjects) {
-            projects = JSON.parse(storedProjects);
-            // Ensure each project has a unique ID
-            projects.forEach((project, index) => {
-                if (!project.id) {
-                    project.id = `project_${Date.now()}_${index}`;
-                }
-            });
+        // Check if user is authenticated
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.log('User not authenticated, showing empty state');
+            projects = [];
+            renderProjects();
+            updateStats();
+            return;
         }
+
+        console.log('Loading projects from backend...');
+        
+        const response = await fetch('/api/projects/my-projects', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load projects: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        projects = result.projects || [];
+        
+        console.log('Loaded projects from backend:', projects);
         renderProjects();
         updateStats();
+        
     } catch (error) {
-        console.error('Error loading projects:', error);
+        console.error('Error loading projects from backend:', error);
         projects = [];
+        renderProjects();
+        updateStats();
     }
 }
 
@@ -105,29 +125,73 @@ function formatDate(dateString) {
 }
 
 // View project details
-function viewProject(projectId) {
+async function viewProject(projectId) {
     console.log('viewProject called with projectId:', projectId);
-    const project = projects.find(p => p.id === projectId);
-    if (project) {
-        console.log('Project found:', project);
+    
+    try {
+        // Check if user is authenticated
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('Please log in to view projects');
+            return;
+        }
+
+        // Fetch project details from backend
+        const response = await fetch(`/api/projects/${projectId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load project: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        const project = result.project;
+        
+        console.log('Fetched project from backend:', project);
+        
         // Store the project data for the dashboard
         localStorage.setItem('currentProject', JSON.stringify(project));
         // Redirect to dashboard
         window.location.href = 'dashboard.html';
-    } else {
-        console.log('No project found with ID:', projectId);
+        
+    } catch (error) {
+        console.error('Error loading project:', error);
+        alert('Failed to load project details');
     }
 }
 
 // Export project as PDF
-function exportProject(projectId) {
+async function exportProject(projectId) {
     console.log('exportProject called with projectId:', projectId);
-    const project = projects.find(p => p.id === projectId);
-    if (!project) {
-        console.log('No project found with ID:', projectId);
-        return;
-    }
-    console.log('Project found for export:', project);
+    
+    try {
+        // Check if user is authenticated
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('Please log in to export projects');
+            return;
+        }
+
+        // Fetch project details from backend
+        const response = await fetch(`/api/projects/${projectId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load project: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        const project = result.project;
+        
+        console.log('Project found for export from backend:', project);
     
     // Check if jsPDF is available
     if (typeof window.jsPDF === 'undefined') {
@@ -317,6 +381,11 @@ function exportProject(projectId) {
         alert('Error generating PDF. Using text export instead.');
         exportProjectAsText(project);
     }
+    
+    } catch (error) {
+        console.error('Error loading project for export:', error);
+        alert('Failed to load project for export');
+    }
 }
 
 // Fallback text export function
@@ -402,18 +471,43 @@ function exportProjectAsText(project) {
 }
 
 // Delete project
-function deleteProject(projectId) {
+async function deleteProject(projectId) {
     console.log('deleteProject called with projectId:', projectId);
+    
     if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-        const projectIndex = projects.findIndex(p => p.id === projectId);
-        if (projectIndex !== -1) {
-            projects.splice(projectIndex, 1);
-            saveProjects();
-            renderProjects();
-            updateStats();
-            console.log('Project deleted successfully');
-        } else {
-            console.log('Project not found for deletion');
+        try {
+            // Check if user is authenticated
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Please log in to delete projects');
+                return;
+            }
+
+            // Delete from backend
+            const response = await fetch(`/api/projects/${projectId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to delete project: ${response.statusText}`);
+            }
+            
+            console.log('Project deleted from backend successfully');
+            
+            // Remove from local projects array
+            const projectIndex = projects.findIndex(p => p.id === projectId);
+            if (projectIndex !== -1) {
+                projects.splice(projectIndex, 1);
+                renderProjects();
+                updateStats();
+            }
+            
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            alert('Failed to delete project');
         }
     }
 }

@@ -123,3 +123,27 @@ ui/.env.local
 ui/.env.development.local
 ui/.env.test.local
 ui/.env.production.local
+
+# Production specific
+backups/
+uploads/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+
+# PM2 files
+.pm2/
+pids/
+*.pid
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+
+# API keys and secrets (additional protection)
+**/api-keys.json
+**/secrets.json
+**/credentials.json

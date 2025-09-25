@@ -4,7 +4,19 @@
   "description": "A comprehensive startup validation tool that helps entrepreneurs evaluate their business ideas through 10 deep, strategic questions.",
   "main": "setup-env.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install:all": "npm install && cd backend && npm install && cd ../ui && npm install",
+    "build": "cd ui && npm run build",
+    "build:prod": "cd ui && npm run build",
+    "setup:production": "node scripts/setup-mysql-db.js",
+    "create:admin": "node scripts/create-admin.js",
+    "start:production": "pm2 start ecosystem.config.js --env production",
+    "stop:production": "pm2 stop evalio-backend",
+    "restart:production": "pm2 restart evalio-backend",
+    "logs:production": "pm2 logs evalio-backend",
+    "monitor:production": "pm2 monit",
+    "backup:db": "node scripts/backup-database.js",
+    "health:check": "curl -f http://localhost:3001/api/health || exit 1"
   },
   "repository": {
     "type": "git",
