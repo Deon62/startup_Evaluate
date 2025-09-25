@@ -115,6 +115,14 @@ async function handleEvaluate() {
         localStorage.setItem('evaluationData', JSON.stringify(result));
         localStorage.setItem('startupAnswers', JSON.stringify(answers));
         
+        // Save project to user's projects list
+        try {
+            saveProjectToUserProjects(result, answers);
+        } catch (projectError) {
+            console.error('Error saving project (non-critical):', projectError);
+            // Don't fail the entire evaluation if project saving fails
+        }
+        
         // Show completion message before redirect
         showCompletionMessage();
         
@@ -482,6 +490,78 @@ function hideLoadingOverlay() {
     if (overlay) {
         overlay.remove();
     }
+}
+
+// Save project to user's projects list
+function saveProjectToUserProjects(evaluationData, answers) {
+    try {
+        console.log('Saving project with evaluationData:', evaluationData);
+        console.log('Saving project with answers:', answers);
+        
+        // Get existing projects
+        let userProjects = [];
+        const storedProjects = localStorage.getItem('userProjects');
+        if (storedProjects) {
+            userProjects = JSON.parse(storedProjects);
+        }
+        
+        // Create new project object
+        const newProject = {
+            id: Date.now().toString(),
+            name: generateProjectName(answers),
+            description: generateProjectDescription(answers),
+            answers: answers,
+            evaluation: evaluationData,
+            overallScore: evaluationData?.evaluation?.overallScore || 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        console.log('Created new project:', newProject);
+        
+        // Add to projects list
+        userProjects.unshift(newProject); // Add to beginning of array
+        
+        // Keep only last 50 projects to prevent localStorage from getting too large
+        if (userProjects.length > 50) {
+            userProjects = userProjects.slice(0, 50);
+        }
+        
+        // Save back to localStorage
+        localStorage.setItem('userProjects', JSON.stringify(userProjects));
+        
+        console.log('Project saved successfully:', newProject.name);
+    } catch (error) {
+        console.error('Error saving project:', error);
+        throw error; // Re-throw to be caught by the calling function
+    }
+}
+
+// Generate project name from answers
+function generateProjectName(answers) {
+    // Try to extract a meaningful name from the first answer (value proposition)
+    if (answers && answers[0] && answers[0].trim()) {
+        const firstAnswer = answers[0].trim();
+        // Take first 50 characters and clean up
+        let name = firstAnswer.substring(0, 50);
+        if (firstAnswer.length > 50) {
+            name += '...';
+        }
+        // Remove special characters and clean up
+        name = name.replace(/[^\w\s-]/g, '').trim();
+        return name || 'Untitled Project';
+    }
+    return 'Untitled Project';
+}
+
+// Generate project description from answers
+function generateProjectDescription(answers) {
+    if (answers && answers[2] && answers[2].trim()) {
+        // Use the customer persona answer (3rd question) as description
+        const description = answers[2].trim();
+        return description.length > 150 ? description.substring(0, 150) + '...' : description;
+    }
+    return 'No description available';
 }
 
 // Back to landing page function
