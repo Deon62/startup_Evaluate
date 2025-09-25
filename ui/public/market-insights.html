@@ -32,6 +32,20 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </nav>
+            
+            <!-- User Profile Section -->
+            <div class="sidebar-profile" id="sidebarProfile">
+                <div class="profile-avatar" onclick="toggleProfileDropdown()">
+                    <span id="profileInitials">D</span>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name" id="profileName">Deon Orina</div>
+                    <div class="profile-email" id="profileEmail">deon@example.com</div>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+                    <div class="dropdown-item" onclick="handleProfileLogout()">Sign Out</div>
+                </div>
+            </div>
         </div>
 
         <!-- Main Content -->

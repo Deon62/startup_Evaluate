@@ -523,3 +523,60 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+// Profile functions
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function handleProfileLogout() {
+    // Clear authentication data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
+    // Redirect to landing page
+    window.location.href = '/index.html';
+}
+
+// Initialize profile data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Get user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+        try {
+            const user = JSON.parse(userData);
+            
+            // Update profile display
+            const profileInitials = document.getElementById('profileInitials');
+            const profileName = document.getElementById('profileName');
+            const profileEmail = document.getElementById('profileEmail');
+            
+            if (profileInitials && user.name) {
+                profileInitials.textContent = user.name.charAt(0).toUpperCase();
+            }
+            
+            if (profileName && user.name) {
+                profileName.textContent = user.name;
+            }
+            
+            if (profileEmail && user.email) {
+                profileEmail.textContent = user.email;
+            }
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+        }
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const profileSection = document.getElementById('sidebarProfile');
+        const dropdown = document.getElementById('profileDropdown');
+        
+        if (profileSection && dropdown && !profileSection.contains(event.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+});
