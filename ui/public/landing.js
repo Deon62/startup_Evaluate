@@ -1,11 +1,22 @@
 // Landing page JavaScript functionality
 
+// Authentication state
+let isLoginMode = true;
+let currentUser = null;
+let showUserDropdown = false;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize pricing toggle
     initializePricingToggle();
     
     // Initialize testimonial carousel
     initializeCarousel();
+    
+    // Initialize authentication
+    initializeAuth();
+    
+    // Check if user is already logged in
+    checkAuthStatus();
 });
 
 function initializePricingToggle() {
@@ -46,6 +57,17 @@ function updatePricing(period) {
             discount.innerHTML = '<span style="color: #F97316; font-size: 0.8rem; font-weight: 600;">Save 40% annually</span>';
             proCard.querySelector('.card-header').appendChild(discount);
         }
+    }
+}
+
+function handleStartEvaluation() {
+    if (currentUser) {
+        // User is logged in, proceed to evaluation
+        window.location.href = '/questions.html';
+    } else {
+        // User is not logged in, show authentication modal with message
+        showAuthModal();
+        showError('Please sign in or create an account to start your evaluation');
     }
 }
 
@@ -203,3 +225,263 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Authentication Functions
+function initializeAuth() {
+    const authForm = document.getElementById('authForm');
+    if (authForm) {
+        authForm.addEventListener('submit', handleAuthSubmit);
+    }
+}
+
+function checkAuthStatus() {
+    const token = localStorage.getItem('authToken');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+        currentUser = JSON.parse(user);
+        updateHeaderForLoggedInUser();
+    }
+}
+
+function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        clearAuthForm();
+    }
+}
+
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    updateAuthModal();
+}
+
+function updateAuthModal() {
+    const title = document.getElementById('authTitle');
+    const subtitle = document.getElementById('authSubtitle');
+    const submitBtn = document.getElementById('authSubmit');
+    const switchText = document.getElementById('authSwitchText');
+    const switchBtn = document.getElementById('authSwitchBtn');
+    const nameGroup = document.getElementById('nameGroup');
+    const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+    const passwordInput = document.getElementById('authPassword');
+    
+    if (isLoginMode) {
+        title.textContent = 'Welcome Back';
+        subtitle.textContent = 'Sign in to your account';
+        submitBtn.textContent = 'Sign In';
+        switchText.textContent = "Don't have an account?";
+        switchBtn.textContent = 'Sign up';
+        nameGroup.style.display = 'none';
+        confirmPasswordGroup.style.display = 'none';
+        passwordInput.placeholder = 'Enter your password';
+    } else {
+        title.textContent = 'Create Account';
+        subtitle.textContent = 'Join Evalio and start evaluating your startup ideas';
+        submitBtn.textContent = 'Create Account';
+        switchText.textContent = 'Already have an account?';
+        switchBtn.textContent = 'Sign in';
+        nameGroup.style.display = 'block';
+        confirmPasswordGroup.style.display = 'block';
+        passwordInput.placeholder = 'Create a password (min 6 characters)';
+    }
+    
+    clearAuthForm();
+}
+
+function clearAuthForm() {
+    document.getElementById('authForm').reset();
+    hideError();
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('authError');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function hideError() {
+    const errorDiv = document.getElementById('authError');
+    errorDiv.style.display = 'none';
+}
+
+async function handleAuthSubmit(e) {
+    e.preventDefault();
+    hideError();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    // Validate registration data
+    if (!isLoginMode) {
+        if (!data.name || data.name.trim().length < 2) {
+            showError('Name must be at least 2 characters');
+            return;
+        }
+        if (data.password !== data.confirmPassword) {
+            showError('Passwords do not match');
+            return;
+        }
+        if (data.password.length < 6) {
+            showError('Password must be at least 6 characters');
+            return;
+        }
+    }
+    
+    const submitBtn = document.getElementById('authSubmit');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = isLoginMode ? 'Signing In...' : 'Creating Account...';
+    submitBtn.disabled = true;
+    
+    try {
+        const url = isLoginMode ? 
+            'http://localhost:3001/api/auth/login' : 
+            'http://localhost:3001/api/auth/register';
+            
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Store user data
+            currentUser = result.data.user;
+            localStorage.setItem('authToken', result.data.token);
+            localStorage.setItem('user', JSON.stringify(result.data.user));
+            
+            // Update header
+            updateHeaderForLoggedInUser();
+            
+            // Close modal
+            hideAuthModal();
+            
+            // Show success message
+            showSuccessMessage(isLoginMode ? 'Welcome back!' : 'Account created successfully!');
+        } else {
+            showError(result.error || 'An error occurred');
+        }
+    } catch (error) {
+        showError('Network error. Please try again.');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+function updateHeaderForLoggedInUser() {
+    const headerActions = document.getElementById('headerActions');
+    if (headerActions && currentUser) {
+        // Show user profile when logged in
+        headerActions.innerHTML = `
+            <div class="user-profile-container">
+                <div class="user-avatar" onclick="toggleUserDropdown()">
+                    ${getUserInitials(currentUser.name)}
+                </div>
+                <div class="user-dropdown" id="userDropdown" style="display: none;">
+                    <div class="user-dropdown-item">${currentUser.name}</div>
+                    <div class="user-dropdown-item" onclick="handleLogout()">Sign Out</div>
+                </div>
+            </div>
+        `;
+    } else if (headerActions) {
+        // Show nothing when not logged in
+        headerActions.innerHTML = '';
+    }
+}
+
+function getUserInitials(name) {
+    return name
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 1);
+}
+
+function toggleUserDropdown() {
+    const dropdown = document.getElementById('userDropdown');
+    if (dropdown) {
+        showUserDropdown = !showUserDropdown;
+        dropdown.style.display = showUserDropdown ? 'block' : 'none';
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const profileContainer = document.querySelector('.user-profile-container');
+    const dropdown = document.getElementById('userDropdown');
+    
+    if (profileContainer && dropdown && showUserDropdown) {
+        if (!profileContainer.contains(event.target)) {
+            showUserDropdown = false;
+            dropdown.style.display = 'none';
+        }
+    }
+});
+
+function handleLogout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    currentUser = null;
+    showUserDropdown = false;
+    
+    // Clear the header actions (no sign-in button)
+    const headerActions = document.getElementById('headerActions');
+    if (headerActions) {
+        headerActions.innerHTML = '';
+    }
+    
+    showSuccessMessage('Signed out successfully');
+}
+
+function showSuccessMessage(message) {
+    // Create a temporary success message
+    const successDiv = document.createElement('div');
+    successDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    `;
+    successDiv.textContent = message;
+    
+    document.body.appendChild(successDiv);
+    
+    setTimeout(() => {
+        successDiv.remove();
+    }, 3000);
+}
+
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const toggle = input.parentElement.querySelector('.password-toggle .eye-icon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        toggle.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        toggle.textContent = '👁️';
+    }
+}

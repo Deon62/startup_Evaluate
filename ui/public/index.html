@@ -11,7 +11,12 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <!-- Logo removed for minimal design -->
+            <div class="header-content">
+                <div class="header-spacer"></div>
+                <div class="header-actions" id="headerActions">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
         </div>
     </header>
 
@@ -21,7 +26,7 @@
             <div class="hero-content">
                 <h1 class="hero-title">With <span class="brand-name">Evalio</span>, Your Startup Ideas Become Measurable Insights</h1>
                 <p class="hero-subtext">Instantly uncover the strengths, risks, and opportunities in your startup idea</p>
-                <button class="cta-button" onclick="startEvaluation()">
+                <button class="cta-button" onclick="handleStartEvaluation()">
                     <span>Start Evaluation</span>
                     <span class="button-icon">→</span>
                 </button>
@@ -64,7 +69,7 @@
                             <span>No advanced graphs</span>
                         </li>
                     </ul>
-                    <button class="card-button free-button" onclick="startEvaluation()">Get Started (Free)</button>
+                    <button class="card-button free-button" onclick="handleStartEvaluation()">Get Started (Free)</button>
                 </div>
 
                 <!-- Pro Tier -->
@@ -204,6 +209,64 @@
             </div>
         </div>
     </footer>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="auth-modal" style="display: none;">
+        <div class="auth-modal-content">
+            <div class="auth-header">
+                <h2 id="authTitle">Welcome Back</h2>
+                <p id="authSubtitle">Sign in to your account</p>
+                <button class="close-button" onclick="hideAuthModal()">×</button>
+            </div>
+
+            <form id="authForm" class="auth-form">
+                <div id="authError" class="error-message" style="display: none;"></div>
+                
+                <div id="nameGroup" class="form-group" style="display: none;">
+                    <label for="authName">Full Name</label>
+                    <input type="text" id="authName" name="name" placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="authEmail">Email</label>
+                    <input type="email" id="authEmail" name="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="authPassword">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="authPassword" name="password" required placeholder="Enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('authPassword')">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="confirmPasswordGroup" class="form-group" style="display: none;">
+                    <label for="authConfirmPassword">Confirm Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="authConfirmPassword" name="confirmPassword" placeholder="Confirm your password">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('authConfirmPassword')">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="authSubmit" class="auth-button primary">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>
+                    <span id="authSwitchText">Don't have an account?</span>
+                    <button type="button" class="link-button" onclick="toggleAuthMode()" id="authSwitchBtn">
+                        Sign up
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
 
     <script src="landing.js"></script>
 </body>
